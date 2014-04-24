@@ -55,17 +55,18 @@ leds_arch_get(void)
 void
 leds_arch_set(unsigned char c)
 {
+  uint32 res_on = 0;
+  uint32 res_off = 0;
   leds = c;
-
-  if ((c&LEDS_ALL) || (c&LEDS_RED && c&LEDS_GREEN))
-    vAHI_DioSetDirection(0, E_AHI_DIO16_INT|
-                            E_AHI_DIO17_INT);
-  else if (c&LEDS_RED)
-    vAHI_DioSetDirection(E_AHI_DIO16_INT, E_AHI_DIO17_INT);
-  else if (c&LEDS_GREEN)
-    vAHI_DioSetDirection(E_AHI_DIO17_INT, E_AHI_DIO16_INT);
+  if(c&LEDS_RED) 
+    res_on = res_on|E_AHI_DIO17_INT;
   else
-    vAHI_DioSetDirection(E_AHI_DIO17_INT|
-                         E_AHI_DIO16_INT, 0);
+    res_off = res_off|E_AHI_DIO17_INT;
+
+  if(c&LEDS_GREEN) 
+    res_on = res_on|E_AHI_DIO16_INT;
+  else
+    res_off = res_off|E_AHI_DIO16_INT;
+  vAHI_DioSetDirection(res_off, res_on); 
 }
 
